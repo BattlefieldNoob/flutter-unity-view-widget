@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -6,9 +8,55 @@ import 'package:flutter/services.dart';
 
 typedef void UnityWidgetCreatedCallback(UnityWidgetController controller);
 
+
+class MessageHandler{
+  int id=0;
+  String seq="";
+  String name;
+  String data;
+
+
+  MessageHandler();
+
+  MessageHandler.fromJson(Map _json) {
+    if (_json.containsKey("id")) {
+      id = _json["id"];
+    }
+    if (_json.containsKey("seq")) {
+      seq = _json["seq"];
+    }
+    if (_json.containsKey("name")) {
+      name = _json["name"];
+    }
+    if (_json.containsKey("data")) {
+      data = _json["data"];
+    }
+  }
+
+  Map<String, Object> toJson() {
+    final Map<String, Object> _json =
+    new Map<String, Object>();
+    if (id != null) {
+      _json["id"] = id;
+    }
+    if (seq != null) {
+      _json["seq"] = seq;
+    }
+    if (name != null) {
+      _json["name"] = name;
+    }
+    if (data != null) {
+      _json["data"] = data;
+    }
+    return _json;
+  }
+}
+
 class UnityWidgetController {
   final _UnityWidgetState _unityWidgetState;
   final MethodChannel channel;
+
+  static const String MessagePrefix = "@UnityMessage@";
 
   UnityWidgetController._(
       this.channel,
@@ -39,6 +87,16 @@ class UnityWidgetController {
       'gameObject': gameObject,
       'methodName': methodName,
       'message': message,
+    });
+  }
+
+  postMessageToManager(MessageHandler message) {
+    var json=jsonEncode(message);
+
+    channel.invokeMethod('postMessage', <String, dynamic>{
+      'gameObject': "UnityMessageManager",
+      'methodName': "onFlutterMessage",
+      'message': "$MessagePrefix$json",
     });
   }
 
