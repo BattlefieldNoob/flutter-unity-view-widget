@@ -1,3 +1,15 @@
+## 0.1.6+8
+
+* Breaking change for unityframework iOS
+
+## 0.1.6+7
+
+* Breaking change for unityframework iOS
+
+## 0.1.6+6
+
+* Breaking change for unityframework iOS
+
 ## 0.1.6+5
 
 * Reworked onUnityMessage for iOS [@krispypen](https://github.com/krispypen)

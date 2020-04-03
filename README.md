@@ -11,13 +11,16 @@
 [![Gitter](https://badges.gitter.im/flutter-unity/community.svg)](https://gitter.im/flutter-unity/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 Flutter unity 3D widget for embedding unity in flutter. Now you can make awesome gamified features of your app in Unity and get it rendered in a Flutter app both in fullscreen and embeddable mode. Works great on Android and iOS. There are now two unity app examples in the unity folder, one with the default scene and another based on Unity AR foundation samples.
+<br />
+<br />
+Note: I have updated the example for Unity 2019.3.5 and there are some new changes in the scripts folder. Please replace your already copied files and folders in your unity project
 
 ## Installation
  First depend on the library by adding this to your packages `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_unity_widget: ^0.1.6+5
+  flutter_unity_widget: ^0.1.6+8
 ```
 
 Now inside your Dart code you can import it.
@@ -77,7 +80,7 @@ Be sure you have at least one scene added to your build.
     3. Mark the following `Target Architectures` :
         - ARMv7        ✅
         - ARM64        ✅
-        - x86          ✅
+        - x86          ✅ (In Unity Version 2019.2+, this feature is not avaliable due to the lack of Unity Official Support)
 
 <img src="https://raw.githubusercontent.com/snowballdigital/flutter-unity-view-widget/master/Screenshot%202019-03-27%2007.31.55.png" width="400" />
 
@@ -90,7 +93,7 @@ Be sure you have at least one scene added to your build.
 
 ### Add Unity Build Scripts and Export
 
-Copy [`Build.cs`](https://github.com/snowballdigital/flutter-unity-view-widget/tree/master/scripts/Editor/Build.cs) and [`XCodePostBuild.cs`](https://github.com/snowballdigital/flutter-unity-view-widget/tree/master/scripts/Editor/XCodePostBuild.cs) to `unity/<Your Unity Project>/Assets/Scripts/Editor/`
+Copy [`Build.cs`](https://github.com/snowballdigital/flutter-unity-view-widget/tree/master/scripts/unity_2019_3_5_later/Editor/Build.cs) and [`XCodePostBuild.cs`](https://github.com/snowballdigital/flutter-unity-view-widget/tree/master/scripts/unity_2019_3_5_later/Editor/XCodePostBuild.cs) to `unity/<Your Unity Project>/Assets/Scripts/Editor/`
 
 Open your unity project in Unity Editor. Now you can export the Unity project with `Flutter/Export Android` (for Unity versions up to 2019.2), `Flutter/Export Android (Unity 2019.3.*)` (for Unity versions 2019.3 and up, which uses the new [Unity as a Library](https://blogs.unity3d.com/2019/06/17/add-features-powered-by-unity-to-native-mobile-apps/) export format), or `Flutter/Export IOS` menu.
 
@@ -105,11 +108,45 @@ IOS will export unity project to `ios/UnityExport`.
  **Android Platform Only**
 
   1. After exporting the unity game, open Android Studio and and add the `Unity Classes` Java `.jar` file as a module to the unity project. You just need to do this once if you are exporting from the same version of Unity everytime. The `.jar` file is located in the ```<Your Flutter Project>/android/UnityExport/lib``` folder
-  2. If using Unity 2019.2 or older, open `build.gradle` of `UnityExport` module and replace the dependencies with
+  2. Add the following to your ```<Your Flutter Project>/android/settings.gradle```file:
+```gradle
+include ":UnityExport"
+project(":UnityExport").projectDir = file("./UnityExport")
+```
+  3. If using Unity 2019.2 or older, open `build.gradle` of `UnityExport` module and replace the dependencies with
 ```gradle
     dependencies {
         implementation project(':unity-classes') // the unity classes module you added from step 1
     }
+```
+  4. To build a release package, you need to add signconfig in `UnityExport/build.gradle`. The code below use the `debug` signConfig for all buildTypes, which can be changed as you well if you need specify signConfig.
+```
+    buildTypes {
+        release {
+            signingConfig signingConfigs.debug
+        }
+        debug {
+            signingConfig signingConfigs.debug
+        }
+        profile{
+            signingConfig signingConfigs.debug
+        }
+        innerTest {
+            //...
+            matchingFallbacks = ['debug', 'release']
+        }
+    }
+``` 
+  5. If you found the duplicate app icons on your launcher after installing the app, you can just open `UnityExport` Manifest file and comment the codes below
+```gradle
+    <activity android:name="com.unity3d.player.UnityPlayerActivity" android:theme="@style/UnityThemeSelector" android:screenOrientation="fullSensor" android:launchMode="singleTask" android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale|layoutDirection|density" android:hardwareAccelerated="false">
+//      <intent-filter>
+//        <action android:name="android.intent.action.MAIN" />
+//        <category android:name="android.intent.category.LAUNCHER" />
+//        <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+//      </intent-filter>
+      <meta-data android:name="unityplayer.UnityActivity" android:value="true" />
+    </activity>
 ```
 
 **iOS Platform Only**
@@ -172,11 +209,13 @@ If you want to use Unity for integrating Augmented Reality in your Flutter app, 
  
 ### Add UnityMessageManager Support
 
-Copy [`UnityMessageManager.cs`](https://github.com/snowballdigital/flutter-unity-view-widget/tree/master/scripts/UnityMessageManager.cs) to your unity project.
+Copy [`UnityMessageManager.cs`](https://github.com/snowballdigital/flutter-unity-view-widget/tree/master/scripts/unity_2019_3_5_later/UnityMessageManager.cs) to your unity project.
 
-Copy this folder [`JsonDotNet`](https://github.com/snowballdigital/flutter-unity-view-widget/tree/master/scripts/JsonDotNet) to your unity project.
+Copy this folder [`JsonDotNet`](https://github.com/snowballdigital/flutter-unity-view-widget/tree/master/scripts/unity_2019_3_5_later/JsonDotNet) to your unity project.
 
-Copy [`link.xml`](https://github.com/snowballdigital/flutter-unity-view-widget/tree/master/scripts/link.xml) to your unity project.
+Copy [`link.xml`](https://github.com/snowballdigital/flutter-unity-view-widget/tree/master/scripts/unity_2019_3_5_later/link.xml) to your unity project.
+
+(2019.3.5* only) Copy this folder [`Plugins`](https://github.com/snowballdigital/flutter-unity-view-widget/tree/master/scripts/unity_2019_3_5_later/Plugins) to your unity project.
 
 <br />
 

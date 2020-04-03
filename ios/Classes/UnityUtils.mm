@@ -11,8 +11,10 @@ static const int constsection = 0;
 
 bool unity_inited = false;
 
+// keep arg for unity init from non main
 int g_argc;
 char** g_argv;
+NSDictionary* appLaunchOpts;
 
 void UnityInitTrampoline();
 
@@ -53,6 +55,8 @@ extern "C" void InitUnity()
 
     [ufw setDataBundleId: "com.unity3d.framework"];
     [ufw frameworkWarmup: g_argc argv: g_argv];
+    // [ufw setExecuteHeader: &_mh_execute_header];
+    // [ufw runEmbeddedWithArgc: gArgc argv: gArgv appLaunchOpts: appLaunchOpts];
 }
 
 extern "C" void UnityPostMessage(NSString* gameObject, NSString* methodName, NSString* message)
